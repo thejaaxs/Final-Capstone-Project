@@ -10,6 +10,7 @@ import { ToastService } from '../../core/services/toast.service';
 import { AuthResponse, RegisterRequest } from '../../shared/models/auth.model';
 import { Customer } from '../../shared/models/customer.model';
 import { Observable, catchError, finalize, map, of, switchMap, throwError } from 'rxjs';
+import { TopNavComponent } from '../layout/top-nav/top-nav.component';
 
 type ProfileSetupResult = 'DEALER' | 'CUSTOMER' | 'PROFILE_FAILED' | 'USER_ONLY';
 
@@ -27,8 +28,9 @@ const PENDING_PROFILE_KEY = 'pending_profile_setup_v1';
 @Component({
   standalone: true,
   selector: 'app-register',
-  imports: [CommonModule, FormsModule],
+  imports: [CommonModule, FormsModule, TopNavComponent],
   template: `
+    <app-top-nav [publicMode]="true"></app-top-nav>
     <section class="auth-page">
       <div class="auth-card">
         <div class="brand-head">
@@ -101,13 +103,13 @@ const PENDING_PROFILE_KEY = 'pending_profile_setup_v1';
   `,
   styles: [`
     .auth-page {
-      min-height: 100vh;
+      min-height: calc(100vh - 70px);
       display: grid;
       place-items: center;
       padding: 1rem 0.8rem;
       background:
-        radial-gradient(60rem 30rem at 10% -10%, #dbe8ff 0%, transparent 58%),
-        radial-gradient(60rem 30rem at 100% 100%, #e5f0ff 0%, transparent 45%);
+        radial-gradient(60rem 30rem at 10% -10%, var(--mm-bg-radial-a) 0%, transparent 58%),
+        radial-gradient(60rem 30rem at 100% 100%, var(--mm-bg-radial-b) 0%, transparent 45%);
     }
 
     .auth-card {
@@ -126,9 +128,9 @@ const PENDING_PROFILE_KEY = 'pending_profile_setup_v1';
     .brand-pill {
       display: inline-block;
       border-radius: 999px;
-      background: #edf3ff;
-      border: 1px solid #d8e4fb;
-      color: #204675;
+      background: var(--mm-surface-soft);
+      border: 1px solid var(--mm-border);
+      color: var(--mm-text);
       font-size: 0.75rem;
       font-weight: 700;
       padding: 0.2rem 0.55rem;
@@ -147,15 +149,15 @@ const PENDING_PROFILE_KEY = 'pending_profile_setup_v1';
       grid-template-columns: repeat(2, 1fr);
       gap: 0.45rem;
       margin: 0.2rem 0 0.35rem;
-      background: #f3f7ff;
-      border: 1px solid #dbe5f8;
+      background: var(--mm-surface-soft);
+      border: 1px solid var(--mm-border);
       border-radius: 12px;
       padding: 0.3rem;
     }
 
     .role-btn {
       background: transparent;
-      color: #1f3f66;
+      color: var(--mm-text);
       border-color: transparent;
       border-radius: 9px;
       font-size: 0.83rem;

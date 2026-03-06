@@ -28,14 +28,14 @@
       </select>
 
       <button class="btn" type="submit" [disabled]="f.invalid || processing || !bookings.length">
-        {{ processing ? 'Processing...' : 'Pay' }}
+        {{ processing ? 'Processing...' : 'Pay with Razorpay' }}
       </button>
     </form>
 
     <div *ngIf="result" class="result">
-      <p><b>Status:</b> {{ result.paymentStatus }}</p>
+      <p><b>Status:</b> {{ result.status }}</p>
       <p><b>Transaction:</b> {{ result.transactionId || 'N/A' }}</p>
-      <p><b>Date:</b> {{ result.paymentDate ? (result.paymentDate | date: 'medium') : '-' }}</p>
+      <p><b>Message:</b> {{ result.message || '-' }}</p>
     </div>
   </article>
 </section>

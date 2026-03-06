@@ -1,0 +1,115 @@
+.card {
+  max-width: 620px;
+}
+
+.subtitle {
+  margin: 0.35rem 0 0.9rem;
+  color: var(--mm-text-muted);
+}
+
+.summary {
+  border: 1px solid var(--mm-border);
+  border-radius: 12px;
+  padding: 0.8rem;
+  background: #fbfdff;
+  margin-bottom: 0.8rem;
+}
+
+.summary p {
+  margin: 0.25rem 0;
+  display: flex;
+  justify-content: space-between;
+  gap: 0.75rem;
+}
+
+.summary span {
+  color: var(--mm-text-muted);
+}
+
+.hint-box {
+  border: 1px dashed #c5d7f7;
+  border-radius: 12px;
+  padding: 0.8rem;
+  background: #f5f9ff;
+}
+
+.hint-box h4 {
+  margin: 0 0 0.35rem;
+}
+
+.hint-box p {
+  margin: 0.25rem 0;
+}
+
+.actions {
+  display: flex;
+  gap: 0.55rem;
+  margin-top: 0.9rem;
+}
+
+.spinner {
+  width: 14px;
+  height: 14px;
+  border-radius: 50%;
+  border: 2px solid rgba(255, 255, 255, 0.82);
+  border-top-color: transparent;
+  display: inline-block;
+  vertical-align: -2px;
+  margin-right: 0.35rem;
+  animation: spin 0.7s linear infinite;
+}
+
+.info {
+  margin-top: 0.7rem;
+  color: var(--mm-text-muted);
+}
+
+.error {
+  margin-top: 0.7rem;
+  color: #b91c1c;
+  font-weight: 600;
+}
+
+.success {
+  margin-top: 0.7rem;
+  color: #166534;
+  font-weight: 700;
+}
+
+.verify-card {
+  margin-top: 0.9rem;
+  border: 1px solid #b9e4c8;
+  border-radius: 12px;
+  background: #edf9f2;
+  padding: 0.8rem;
+  display: grid;
+  gap: 0.35rem;
+}
+
+.verify-card h4 {
+  margin: 0 0 0.25rem;
+}
+
+.verify-card p {
+  margin: 0;
+  display: flex;
+  justify-content: space-between;
+  gap: 0.6rem;
+}
+
+.verify-card p span {
+  color: #4a6f56;
+}
+
+.verify-card small {
+  color: #345243;
+}
+
+@keyframes spin {
+  from {
+    transform: rotate(0deg);
+  }
+  to {
+    transform: rotate(360deg);
+  }
+}

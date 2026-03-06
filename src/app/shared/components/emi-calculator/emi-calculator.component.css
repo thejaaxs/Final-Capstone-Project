@@ -1,0 +1,157 @@
+.emi-backdrop {
+  position: fixed;
+  inset: 0;
+  z-index: 7000;
+  background: rgba(7, 12, 20, 0.58);
+  display: grid;
+  place-items: center;
+  padding: 1rem;
+}
+
+.emi-modal {
+  width: min(92vw, 760px);
+  max-height: 92vh;
+  overflow: auto;
+  background: var(--surface, var(--mm-surface));
+  border: 1px solid var(--border, var(--mm-border));
+  border-radius: 18px;
+  box-shadow: var(--mm-shadow-lg);
+  padding: 1rem;
+  display: grid;
+  gap: 0.9rem;
+}
+
+.emi-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 0.6rem;
+}
+
+.emi-header h3 {
+  margin: 0;
+  color: var(--text, var(--mm-text));
+}
+
+.icon-btn {
+  width: 2rem;
+  height: 2rem;
+  border-radius: 999px;
+  border: 1px solid var(--border, var(--mm-border));
+  background: var(--surface, var(--mm-surface));
+  color: var(--text, var(--mm-text));
+  padding: 0;
+  display: grid;
+  place-items: center;
+  font-weight: 700;
+}
+
+.emi-input-grid {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 0.75rem;
+}
+
+.field {
+  display: grid;
+  gap: 0.35rem;
+}
+
+.field label {
+  font-size: 0.78rem;
+  font-weight: 700;
+  color: var(--muted, var(--mm-text-muted));
+}
+
+.tenure-wrap {
+  border: 1px solid var(--border, var(--mm-border));
+  border-radius: 14px;
+  background: var(--surface, var(--mm-surface));
+  padding: 0.75rem;
+  display: grid;
+  gap: 0.6rem;
+}
+
+.tenure-head {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 0.5rem;
+}
+
+.tenure-head label {
+  margin: 0;
+}
+
+.tenure-head strong {
+  color: var(--primary, var(--mm-primary-600));
+}
+
+.tenure-slider {
+  width: 100%;
+  accent-color: var(--primary, var(--mm-primary-600));
+}
+
+.validation {
+  margin: 0;
+  color: #b91c1c;
+  font-size: 0.84rem;
+  font-weight: 700;
+}
+
+.result-card,
+.amortization {
+  border: 1px solid var(--border, var(--mm-border));
+  border-radius: 14px;
+  background: color-mix(in srgb, var(--surface, var(--mm-surface)) 86%, #edf3ff);
+  padding: 0.78rem;
+  display: grid;
+  gap: 0.45rem;
+}
+
+.result-card.disabled {
+  opacity: 0.68;
+}
+
+.result-row {
+  display: flex;
+  align-items: baseline;
+  justify-content: space-between;
+  gap: 0.7rem;
+}
+
+.result-row span {
+  color: var(--muted, var(--mm-text-muted));
+  font-size: 0.88rem;
+}
+
+.result-row b {
+  color: var(--text, var(--mm-text));
+  font-size: 0.95rem;
+}
+
+.muted-row b {
+  font-size: 0.86rem;
+}
+
+.amortization h4 {
+  margin: 0 0 0.2rem;
+  font-size: 0.94rem;
+  color: var(--text, var(--mm-text));
+}
+
+.actions {
+  display: flex;
+  justify-content: flex-end;
+}
+
+@media (max-width: 720px) {
+  .emi-modal {
+    width: 96vw;
+    padding: 0.85rem;
+  }
+
+  .emi-input-grid {
+    grid-template-columns: 1fr;
+  }
+}

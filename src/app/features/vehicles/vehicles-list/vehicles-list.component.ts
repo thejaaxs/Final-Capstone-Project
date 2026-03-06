@@ -68,11 +68,7 @@ import { VehicleCardComponent } from '../../../shared/ui/vehicle-card.component'
         </a>
       </div>
 
-      <app-skeleton-loader *ngIf="loading && role === 'ROLE_CUSTOMER'" [grid]="true" variant="card" [count]="6"></app-skeleton-loader>
-
-      <div class="panel" *ngIf="loading && role !== 'ROLE_CUSTOMER'">
-        <app-skeleton-loader variant="row" [count]="6"></app-skeleton-loader>
-      </div>
+      <app-skeleton-loader *ngIf="loading" [grid]="true" variant="card" [count]="role === 'ROLE_CUSTOMER' ? 6 : 4"></app-skeleton-loader>
 
       <div class="state-card error" *ngIf="!loading && errorMessage">
         <p>{{ errorMessage }}</p>
@@ -95,35 +91,27 @@ import { VehicleCardComponent } from '../../../shared/ui/vehicle-card.component'
         ></app-vehicle-card>
       </div>
 
-      <table *ngIf="!loading && !errorMessage && filteredList.length > 0 && role !== 'ROLE_CUSTOMER'">
-        <thead>
-          <tr>
-            <th>ID</th>
-            <th>Name</th>
-            <th>Brand</th>
-            <th>Dealer</th>
-            <th>Price</th>
-            <th>Status</th>
-            <th>Actions</th>
-          </tr>
-        </thead>
-        <tbody>
-          <tr *ngFor="let v of filteredList">
-            <td>{{ v.id }}</td>
-            <td>{{ v.name }}</td>
-            <td>{{ v.brand }}</td>
-            <td>{{ getDealerName(v.dealerId) }}</td>
-            <td>INR {{ v.price | number: '1.0-0' }}</td>
-            <td><app-badge [value]="formatVehicleStatus(v.status)"></app-badge></td>
-            <td>
-              <div class="table-actions">
-                <a [routerLink]="['/dealer/vehicles/edit', v.id]"><button class="btn btn-ghost" type="button">Edit</button></a>
-                <button class="btn btn-danger" type="button" (click)="del(v.id!)">Delete</button>
-              </div>
-            </td>
-          </tr>
-        </tbody>
-      </table>
+      <div class="vehicle-grid dealer-grid" *ngIf="!loading && !errorMessage && filteredList.length > 0 && role !== 'ROLE_CUSTOMER'">
+        <article class="dealer-vehicle-card" *ngFor="let v of filteredList">
+          <div class="dealer-image-wrap">
+            <img [src]="v.imageUrl || placeholderImage" [alt]="v.name" class="dealer-image" />
+          </div>
+          <div class="dealer-content">
+            <h3 [title]="v.name">{{ v.name }}</h3>
+            <p class="dealer-meta" [title]="v.brand + ' | ' + getDealerName(v.dealerId)">
+              {{ v.brand }} | {{ getDealerName(v.dealerId) }}
+            </p>
+            <p class="dealer-price">INR {{ v.price | number: '1.0-0' }}</p>
+            <div class="dealer-status">
+              <app-badge [value]="formatVehicleStatus(v.status)"></app-badge>
+            </div>
+            <div class="dealer-actions">
+              <a [routerLink]="['/dealer/vehicles/edit', v.id]"><button class="btn btn-ghost" type="button">Edit</button></a>
+              <button class="btn btn-danger" type="button" (click)="del(v.id!)">Delete</button>
+            </div>
+          </div>
+        </article>
+      </div>
     </section>
   `,
   styleUrl: './vehicles-list.component.css'
@@ -132,6 +120,7 @@ export class VehiclesListComponent implements OnInit {
   list: Vehicle[] = [];
   loading = false;
   errorMessage = '';
+  placeholderImage = 'https://placehold.co/640x360/e5edf7/36597f?text=MotoMint';
   skeletonCards = [1, 2, 3, 4, 5, 6];
   skeletonRows = [1, 2, 3, 4, 5];
   searchText = '';

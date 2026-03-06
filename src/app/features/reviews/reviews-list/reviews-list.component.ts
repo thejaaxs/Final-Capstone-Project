@@ -151,7 +151,10 @@ export class ReviewsListComponent implements OnInit {
 
   loadByProduct() {
     const p = this.productName.trim();
-    if (!p) return this.toast.error('Enter product name');
+    if (!p) {
+      this.toast.error('Enter product name');
+      return;
+    }
     if (this.loading) return;
     this.loading = true;
     this.errorMessage = '';

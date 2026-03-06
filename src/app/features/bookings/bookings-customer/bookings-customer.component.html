@@ -53,7 +53,18 @@
         <td>{{ b.amount ?? '-' }}</td>
         <td>{{ b.deliveryDate ? (b.deliveryDate | date: 'medium') : '-' }}</td>
         <td>
-          <button class="btn btn-danger" [disabled]="!canCancel(b)" (click)="cancel(b.id!)">Cancel</button>
+          <div class="actions">
+            <button class="btn btn-danger" [disabled]="!canCancel(b)" (click)="cancel(b.id!)">Cancel</button>
+            <button
+              *ngIf="canShowPay(b)"
+              class="btn"
+              [disabled]="!canPay(b)"
+              [title]="payTooltip(b)"
+              (click)="openPayment(b)"
+            >
+              Pay Now
+            </button>
+          </div>
         </td>
       </tr>
     </tbody>

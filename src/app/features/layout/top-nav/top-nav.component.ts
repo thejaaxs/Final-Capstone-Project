@@ -1,9 +1,10 @@
 import { CommonModule } from '@angular/common';
-import { Component, HostListener, Input } from '@angular/core';
-import { FormsModule } from '@angular/forms';
+import { Component, HostListener, Input, OnDestroy, OnInit } from '@angular/core';
 import { NavigationEnd, Router, RouterLink, RouterLinkActive } from '@angular/router';
-import { filter } from 'rxjs';
+import { Subscription, filter } from 'rxjs';
 import { AuthService } from '../../../core/services/auth.service';
+import { DealerNotificationItem, DealerNotificationsService } from '../../../core/services/dealer-notifications.service';
+import { ThemeService } from '../../../core/services/theme.service';
 import { UserRole } from '../../../shared/models/auth.model';
 
 interface NavItem {
@@ -14,10 +15,10 @@ interface NavItem {
 @Component({
   standalone: true,
   selector: 'app-top-nav',
-  imports: [CommonModule, FormsModule, RouterLink, RouterLinkActive],
+  imports: [CommonModule, RouterLink, RouterLinkActive],
   template: `
     <header class="mm-topnav">
-      <div class="mm-topnav-inner">
+      <div class="mm-topnav-inner" [class.guest-mode]="!isAuthenticated">
         <button type="button" class="menu-toggle" (click)="toggleMobileNav($event)" aria-label="Toggle navigation">
           <span></span>
           <span></span>
@@ -32,16 +33,66 @@ interface NavItem {
           </span>
         </a>
 
-        <form class="top-search desktop-search" (ngSubmit)="onSearch()">
-          <input type="search" [(ngModel)]="searchTerm" name="searchTerm" placeholder="Search bikes, scooters, brands..." />
-          <button type="submit" class="btn btn-ghost">Search</button>
-        </form>
-
-        <nav class="nav-links desktop-nav" *ngIf="navLinks.length">
+        <nav class="nav-links desktop-nav" *ngIf="navLinks.length && isAuthenticated">
           <a *ngFor="let link of navLinks" [routerLink]="link.path" routerLinkActive="active">{{ link.label }}</a>
         </nav>
 
-        <div class="account-wrap" *ngIf="isAuthenticated; else guestActions">
+        <div class="quick-actions">
+          <nav class="nav-links quick-links" *ngIf="navLinks.length && !isAuthenticated">
+            <a *ngFor="let link of navLinks" [routerLink]="link.path" routerLinkActive="active">{{ link.label }}</a>
+          </nav>
+
+          <button
+            type="button"
+            class="theme-toggle btn btn-ghost"
+            aria-label="Toggle dark mode"
+            title="Toggle dark mode"
+            [attr.aria-pressed]="isDarkMode"
+            (click)="toggleTheme($event)"
+          >
+            <span class="theme-icon">{{ isDarkMode ? '\u2600' : '\u263E' }}</span>
+          </button>
+
+          <div class="notification-wrap" *ngIf="showDealerNotifications">
+            <button
+              type="button"
+              class="bell-btn"
+              aria-label="Dealer notifications"
+              (click)="toggleNotifications($event)"
+            >
+              <span class="bell-icon">{{ '\u{1F514}' }}</span>
+              <span class="bell-count" *ngIf="unreadNotifications > 0">{{ unreadNotifications }}</span>
+            </button>
+
+            <div class="notifications-menu" *ngIf="notificationOpen" (click)="$event.stopPropagation()">
+              <div class="notifications-head">
+                <strong>Notifications</strong>
+                <button type="button" class="btn btn-ghost" (click)="markAllNotificationsRead($event)">Mark all read</button>
+              </div>
+
+              <p class="notifications-empty" *ngIf="dealerNotifications.length === 0">
+                No payment notifications yet.
+              </p>
+
+              <article class="note-item" *ngFor="let item of dealerNotifications | slice:0:6">
+                <p class="note-message">{{ item.message }}</p>
+                <small *ngIf="item.amount !== undefined">Amount: INR {{ item.amount | number: '1.0-0' }}</small>
+                <small *ngIf="item.createdAt">{{ item.createdAt | date: 'medium' }}</small>
+              </article>
+
+              <button type="button" class="btn btn-ghost note-footer-btn" (click)="openDealerBookings()">
+                Open Bookings
+              </button>
+            </div>
+          </div>
+
+          <div class="guest-actions" *ngIf="!isAuthenticated">
+            <a routerLink="/login"><button type="button" class="btn btn-ghost">Login</button></a>
+            <a routerLink="/register"><button type="button" class="btn btn-accent">Register</button></a>
+          </div>
+        </div>
+
+        <div class="account-wrap" *ngIf="isAuthenticated">
           <button type="button" class="profile-btn" (click)="toggleProfile($event)">
             <span class="profile-meta">
               <span class="profile-email" [title]="email || ''">{{ email || 'user' }}</span>
@@ -55,25 +106,19 @@ interface NavItem {
             <button type="button" class="btn btn-danger" (click)="logout()">Logout</button>
           </div>
         </div>
-
-        <ng-template #guestActions>
-          <div class="guest-actions">
-            <a routerLink="/login"><button type="button" class="btn btn-ghost">Login</button></a>
-            <a routerLink="/register"><button type="button" class="btn btn-accent">Register</button></a>
-          </div>
-        </ng-template>
       </div>
 
       <div class="mobile-drawer" *ngIf="mobileNavOpen">
-        <form class="top-search mobile-search" (ngSubmit)="onSearch()">
-          <input type="search" [(ngModel)]="searchTerm" name="mobileSearchTerm" placeholder="Search bikes, scooters, brands..." />
-          <button type="submit" class="btn btn-ghost">Search</button>
-        </form>
         <nav class="nav-links mobile-nav" *ngIf="navLinks.length">
           <a *ngFor="let link of navLinks" [routerLink]="link.path" routerLinkActive="active" (click)="closeAllMenus()">
             {{ link.label }}
           </a>
         </nav>
+        <div class="mobile-theme">
+          <button type="button" class="btn btn-ghost" aria-label="Toggle dark mode" title="Toggle dark mode" (click)="toggleTheme()">
+            <span class="theme-icon">{{ isDarkMode ? '\u2600' : '\u263E' }}</span>
+          </button>
+        </div>
         <div class="mobile-actions" *ngIf="!isAuthenticated">
           <a routerLink="/login"><button type="button" class="btn btn-ghost" (click)="closeAllMenus()">Login</button></a>
           <a routerLink="/register"><button type="button" class="btn btn-accent" (click)="closeAllMenus()">Register</button></a>
@@ -83,7 +128,7 @@ interface NavItem {
   `,
   styleUrl: './top-nav.component.css'
 })
-export class TopNavComponent {
+export class TopNavComponent implements OnInit, OnDestroy {
   @Input() publicMode = false;
 
   role: UserRole | null;
@@ -91,16 +136,39 @@ export class TopNavComponent {
   navLinks: NavItem[] = [];
   profileOpen = false;
   mobileNavOpen = false;
-  searchTerm = '';
+  notificationOpen = false;
+  dealerNotifications: DealerNotificationItem[] = [];
+  unreadNotifications = 0;
+  private subs = new Subscription();
+  private notificationsStarted = false;
 
-  constructor(private auth: AuthService, private router: Router) {
+  constructor(
+    private auth: AuthService,
+    private router: Router,
+    private theme: ThemeService,
+    private dealerNotificationsService: DealerNotificationsService
+  ) {
     this.role = this.auth.getRole();
     this.email = this.auth.getEmail();
     this.navLinks = this.buildNavLinks(this.role);
 
-    this.router.events
+    const routeSub = this.router.events
       .pipe(filter((event): event is NavigationEnd => event instanceof NavigationEnd))
       .subscribe(() => this.closeAllMenus());
+    this.subs.add(routeSub);
+  }
+
+  ngOnInit(): void {
+    if (this.showDealerNotifications) {
+      this.startDealerNotifications();
+    }
+  }
+
+  ngOnDestroy(): void {
+    this.subs.unsubscribe();
+    if (this.notificationsStarted) {
+      this.dealerNotificationsService.stop();
+    }
   }
 
   get isAuthenticated(): boolean {
@@ -108,36 +176,61 @@ export class TopNavComponent {
     return !!this.role;
   }
 
-  get roleLabel(): string {
-    return (this.role || 'ROLE_GUEST').replace('ROLE_', '');
+  get isDarkMode(): boolean {
+    return this.theme.isDark();
   }
 
-  onSearch() {
-    const q = this.searchTerm.trim();
-    if (!q) return;
-    if (this.role === 'ROLE_CUSTOMER') {
-      this.router.navigate(['/customer/vehicles'], { queryParams: { q } });
-    } else if (this.role === 'ROLE_DEALER') {
-      this.router.navigate(['/dealer/vehicles'], { queryParams: { q } });
-    } else {
-      this.router.navigate(['/login']);
-    }
-    this.closeAllMenus();
+  get showDealerNotifications(): boolean {
+    return !this.publicMode && this.role === 'ROLE_DEALER';
+  }
+
+  get roleLabel(): string {
+    return (this.role || 'ROLE_GUEST').replace('ROLE_', '');
   }
 
   toggleProfile(event: MouseEvent) {
     event.stopPropagation();
     this.profileOpen = !this.profileOpen;
     this.mobileNavOpen = false;
+    this.notificationOpen = false;
   }
 
   toggleMobileNav(event: MouseEvent) {
     event.stopPropagation();
     this.mobileNavOpen = !this.mobileNavOpen;
     this.profileOpen = false;
+    this.notificationOpen = false;
+  }
+
+  toggleTheme(event?: MouseEvent) {
+    event?.stopPropagation();
+    this.theme.toggle();
+  }
+
+  toggleNotifications(event: MouseEvent) {
+    event.stopPropagation();
+    this.notificationOpen = !this.notificationOpen;
+    this.profileOpen = false;
+    if (this.notificationOpen) {
+      this.mobileNavOpen = false;
+    }
+  }
+
+  markAllNotificationsRead(event: MouseEvent) {
+    event.stopPropagation();
+    this.dealerNotificationsService.markAllRead();
+  }
+
+  openDealerBookings() {
+    this.closeAllMenus();
+    this.router.navigateByUrl('/dealer/bookings');
   }
 
   logout() {
+    if (this.notificationsStarted) {
+      this.dealerNotificationsService.stop();
+      this.notificationsStarted = false;
+    }
     this.auth.logout();
     this.closeAllMenus();
     this.router.navigateByUrl('/login');
@@ -151,6 +244,7 @@ export class TopNavComponent {
   closeAllMenus() {
     this.profileOpen = false;
     this.mobileNavOpen = false;
+    this.notificationOpen = false;
   }
 
   @HostListener('document:click')
@@ -171,6 +265,7 @@ export class TopNavComponent {
     if (role === 'ROLE_DEALER') {
       return [
         { label: 'Vehicles', path: '/dealer/vehicles' },
+        { label: 'Booking Requests', path: '/dealer/booking-requests' },
         { label: 'Bookings', path: '/dealer/bookings' },
       ];
     }
@@ -186,5 +281,16 @@ export class TopNavComponent {
       { label: 'Home', path: '/home' },
       { label: 'Browse', path: '/login' },
     ];
+  }
+
+  private startDealerNotifications(): void {
+    this.notificationsStarted = true;
+    this.dealerNotificationsService.start();
+    this.subs.add(this.dealerNotificationsService.items$.subscribe((items) => {
+      this.dealerNotifications = items;
+    }));
+    this.subs.add(this.dealerNotificationsService.unreadCount$.subscribe((count) => {
+      this.unreadNotifications = count;
+    }));
   }
 }

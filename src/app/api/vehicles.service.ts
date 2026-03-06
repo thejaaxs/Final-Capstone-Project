@@ -59,11 +59,12 @@ export class VehiclesApi {
   }
 
   private normalizeVehicle(v: Vehicle): Vehicle {
-    if (!v?.imageUrl) return v;
+    const fuelType = (v?.fuelType || '').toUpperCase() === 'ELECTRIC' ? 'ELECTRIC' : 'PETROL';
+    if (!v?.imageUrl) return { ...v, fuelType };
     if (v.imageUrl.startsWith('http://') || v.imageUrl.startsWith('https://') || v.imageUrl.startsWith('/api')) {
-      return v;
+      return { ...v, fuelType };
     }
     const prefix = v.imageUrl.startsWith('/') ? '' : '/';
-    return { ...v, imageUrl: `${environment.apiBaseUrl}${prefix}${v.imageUrl}` };
+    return { ...v, fuelType, imageUrl: `${environment.apiBaseUrl}${prefix}${v.imageUrl}` };
   }
 }

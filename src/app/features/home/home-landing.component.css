@@ -33,53 +33,17 @@
   border-color: #b8caef;
 }
 
-.carousel-frame {
-  position: relative;
+.gallery-frame {
+  width: 100%;
+  overflow: hidden;
 }
 
-.carousel-track {
-  overflow-x: auto;
+.gallery-track {
   display: grid;
-  grid-auto-flow: column;
-  grid-auto-columns: minmax(250px, 280px);
+  grid-template-columns: repeat(auto-fit, minmax(235px, 1fr));
   gap: 0.8rem;
-  padding: 0.2rem 0.1rem 0.55rem;
-  scroll-behavior: smooth;
-}
-
-.carousel-track::-webkit-scrollbar {
-  height: 8px;
-}
-
-.carousel-track::-webkit-scrollbar-thumb {
-  border-radius: 999px;
-  background: #c8d6ec;
-}
-
-.carousel-btn {
-  position: absolute;
-  top: 48%;
-  transform: translateY(-50%);
-  width: 34px;
-  height: 34px;
-  border-radius: 999px;
-  border: 1px solid #d0dced;
-  background: #ffffff;
-  color: #264a79;
-  box-shadow: var(--mm-shadow-sm);
-  z-index: 2;
-  padding: 0;
-  display: grid;
-  place-items: center;
-  font-size: 1.1rem;
-}
-
-.carousel-btn.left {
-  left: -12px;
-}
-
-.carousel-btn.right {
-  right: -12px;
+  width: 100%;
+  padding: 0.2rem 0.1rem 0.32rem;
 }
 
 .insight-tile p {
@@ -95,7 +59,7 @@
     padding: 0.85rem 0.78rem 0;
   }
 
-  .carousel-btn {
-    display: none;
+  .gallery-track {
+    grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
   }
 }

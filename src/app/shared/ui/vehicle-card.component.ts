@@ -42,6 +42,7 @@ import { BadgeComponent } from './badge.component';
       padding: 0.72rem;
       box-shadow: var(--mm-shadow-sm);
       transition: transform 0.18s ease, box-shadow 0.2s ease, border-color 0.2s ease;
+      min-width: 0;
     }
 
     .mm-vehicle-card:hover {
@@ -84,6 +85,7 @@ import { BadgeComponent } from './badge.component';
     .content {
       display: grid;
       gap: 0.32rem;
+      min-width: 0;
     }
 
     h3 {
@@ -148,7 +150,6 @@ export class VehicleCardComponent {
   }
 
   get extraTag(): string {
-    if (!this.vehicle.id) return 'Certified';
-    return this.vehicle.id % 2 === 0 ? 'Petrol' : 'Electric';
+    return (this.vehicle.fuelType || '').toUpperCase() === 'ELECTRIC' ? 'Electric' : 'Petrol';
   }
 }

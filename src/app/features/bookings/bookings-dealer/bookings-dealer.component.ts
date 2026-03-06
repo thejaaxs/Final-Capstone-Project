@@ -66,30 +66,30 @@ export class BookingsDealerComponent {
   }
 
   canConfirm(b: Booking): boolean {
-    return b.bookingStatus === 'PENDING';
+    return this.normalizeBookingStatus(b.bookingStatus) === 'REQUESTED';
   }
 
   canCancel(b: Booking): boolean {
-    return b.bookingStatus === 'PENDING' || b.bookingStatus === 'CONFIRMED';
+    return this.normalizeBookingStatus(b.bookingStatus) === 'REQUESTED';
   }
 
   confirm(id: number) {
-    this.api.confirm(id).subscribe({
+    this.api.acceptBooking(id).subscribe({
       next: () => {
-        this.toast.success('Booking confirmed');
+        this.toast.success('Booking accepted');
         this.load();
       },
-      error: (err: HttpErrorResponse) => this.toast.error(err.error?.message || 'Confirm failed'),
+      error: (err: HttpErrorResponse) => this.toast.error(err.error?.message || 'Accept failed'),
     });
   }
 
   cancel(id: number) {
-    this.api.cancel(id).subscribe({
+    this.api.rejectBooking(id).subscribe({
       next: () => {
-        this.toast.success('Booking cancelled');
+        this.toast.success('Booking rejected');
         this.load();
       },
-      error: (err: HttpErrorResponse) => this.toast.error(err.error?.message || 'Cancel failed'),
+      error: (err: HttpErrorResponse) => this.toast.error(err.error?.message || 'Reject failed'),
     });
   }
 
@@ -104,6 +104,16 @@ export class BookingsDealerComponent {
     const normalized = (status || '').toUpperCase();
     if (normalized === 'PAID') return 'badge-paid';
     return 'badge-unpaid';
+  }
+
+  private normalizeBookingStatus(status?: string): 'REQUESTED' | 'ACCEPTED' | 'REJECTED' | 'CONFIRMED' | 'CANCELLED' {
+    const normalized = (status || '').toUpperCase();
+    if (normalized === 'ACCEPTED') return 'ACCEPTED';
+    if (normalized === 'REJECTED') return 'REJECTED';
+    if (normalized === 'CONFIRMED') return 'CONFIRMED';
+    if (normalized === 'CANCELLED') return 'CANCELLED';
+    if (normalized === 'PENDING') return 'REQUESTED';
+    return 'REQUESTED';
   }
 }
 

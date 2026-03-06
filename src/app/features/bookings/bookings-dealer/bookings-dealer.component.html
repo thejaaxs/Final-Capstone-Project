@@ -53,8 +53,8 @@
         <td>{{ b.deliveryDate ? (b.deliveryDate | date: 'medium') : '-' }}</td>
         <td>
           <div class="table-actions">
-            <button class="btn btn-ghost" [disabled]="!canConfirm(b)" (click)="confirm(b.id!)">Confirm</button>
-            <button class="btn btn-danger" [disabled]="!canCancel(b)" (click)="cancel(b.id!)">Cancel</button>
+            <button class="btn btn-ghost" [disabled]="!canConfirm(b)" (click)="confirm(b.id!)">Accept</button>
+            <button class="btn btn-danger" [disabled]="!canCancel(b)" (click)="cancel(b.id!)">Reject</button>
           </div>
         </td>
       </tr>

@@ -5,3 +5,9 @@
 td:last-child {
   white-space: nowrap;
 }
+
+.actions {
+  display: flex;
+  gap: 0.45rem;
+  align-items: center;
+}

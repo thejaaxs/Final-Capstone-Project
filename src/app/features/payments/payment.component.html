@@ -1,0 +1,42 @@
+<section class="page-card page-shell">
+  <article class="card">
+    <h2>Booking Payment</h2>
+    <p class="subtitle">Complete secure payment using Razorpay Checkout.</p>
+
+    <div class="summary">
+      <p><span>Booking ID</span><b>#{{ bookingId }}</b></p>
+      <p><span>Customer ID</span><b>{{ customerId || '-' }}</b></p>
+      <p><span>Booking Status</span><b>{{ booking?.bookingStatus || '-' }}</b></p>
+      <p><span>Payment Status</span><b>{{ booking?.paymentStatus || '-' }}</b></p>
+    </div>
+
+    <div class="hint-box">
+      <h4>Test Card</h4>
+      <p>Card: 4111 1111 1111 1111</p>
+      <p>CVV: 123</p>
+      <p>OTP: 123456</p>
+    </div>
+
+    <div class="actions">
+      <button class="btn" type="button" (click)="payNow()" [disabled]="loading || loadingBooking || resolvingCustomer || !bookingId || !customerId">
+        <span class="spinner" *ngIf="loading"></span>
+        {{ payButtonLabel }}
+      </button>
+      <button class="btn btn-ghost" type="button" (click)="back()" [disabled]="loading">Back</button>
+    </div>
+
+    <p class="info" *ngIf="loadingBooking">Loading booking details...</p>
+    <p class="info" *ngIf="resolvingCustomer">Resolving customer profile...</p>
+    <p class="error" *ngIf="errorMsg">{{ errorMsg }}</p>
+    <p class="success" *ngIf="successMsg">{{ successMsg }}</p>
+
+    <section class="verify-card" *ngIf="verifyResult as result">
+      <h4>Payment Confirmation</h4>
+      <p><span>Status</span><b>{{ result.status }}</b></p>
+      <p><span>Booking ID</span><b>#{{ result.bookingId }}</b></p>
+      <p><span>Transaction</span><b>{{ result.transactionId || '-' }}</b></p>
+      <button type="button" class="btn btn-ghost" (click)="goToBookings()">Go to My Bookings</button>
+      <small *ngIf="redirectInSeconds > 0">Redirecting in {{ redirectInSeconds }}s...</small>
+    </section>
+  </article>
+</section>

@@ -2,6 +2,7 @@ import { Injectable } from '@angular/core';
 import { AuthResponse, UserRole } from '../../shared/models/auth.model';
 
 const KEY = 'jwt_auth_v1';
+const PROFILE_KEY = 'jwt_profile_ctx_v1';
 
 export interface JwtAuthState {
   token: string;
@@ -9,11 +10,16 @@ export interface JwtAuthState {
   role: UserRole;
 }
 
+interface ProfileContextState {
+  dealerId?: number;
+  customerId?: number;
+}
+
 @Injectable({ providedIn: 'root' })
 export class AuthService {
   private readonly roleHomeMap: Record<UserRole, string> = {
-    ROLE_CUSTOMER: '/home',
-    ROLE_DEALER: '/home',
+    ROLE_CUSTOMER: '/customer/vehicles',
+    ROLE_DEALER: '/dealer/vehicles',
     ROLE_ADMIN: '/forbidden',
   };
 
@@ -39,10 +45,12 @@ export class AuthService {
       role: res.role,
     };
     localStorage.setItem(KEY, JSON.stringify(state));
+    localStorage.removeItem(PROFILE_KEY);
   }
 
   logout() {
     localStorage.removeItem(KEY);
+    localStorage.removeItem(PROFILE_KEY);
   }
 
   getToken(): string | null {
@@ -60,5 +68,43 @@ export class AuthService {
   getHomeRoute(role = this.getRole()): string {
     if (!role) return '/login';
     return this.roleHomeMap[role] ?? '/login';
+  }
+
+  getDealerId(): number | null {
+    return this.getProfileState()?.dealerId ?? null;
+  }
+
+  setDealerId(dealerId: number): void {
+    if (!Number.isFinite(dealerId) || dealerId <= 0) return;
+    const state = this.getProfileState() || {};
+    state.dealerId = dealerId;
+    this.setProfileState(state);
+  }
+
+  getCustomerId(): number | null {
+    return this.getProfileState()?.customerId ?? null;
+  }
+
+  setCustomerId(customerId: number): void {
+    if (!Number.isFinite(customerId) || customerId <= 0) return;
+    const state = this.getProfileState() || {};
+    state.customerId = customerId;
+    this.setProfileState(state);
+  }
+
+  private getProfileState(): ProfileContextState | null {
+    const raw = localStorage.getItem(PROFILE_KEY);
+    if (!raw) return null;
+    try {
+      const parsed = JSON.parse(raw) as ProfileContextState;
+      return parsed && typeof parsed === 'object' ? parsed : null;
+    } catch {
+      localStorage.removeItem(PROFILE_KEY);
+      return null;
+    }
+  }
+
+  private setProfileState(state: ProfileContextState): void {
+    localStorage.setItem(PROFILE_KEY, JSON.stringify(state));
   }
 }

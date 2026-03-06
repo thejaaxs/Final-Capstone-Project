@@ -5,7 +5,7 @@ export interface Booking {
   vehicleId: number;
   bookingDate?: string;
   deliveryDate?: string;
-  bookingStatus?: 'PENDING' | 'CONFIRMED' | 'CANCELLED' | string;
+  bookingStatus?: 'REQUESTED' | 'ACCEPTED' | 'REJECTED' | 'CONFIRMED' | 'CANCELLED' | 'PENDING' | string;
   paymentStatus?: 'UNPAID' | 'PAID' | string;
   amount?: number;
   createdAt?: string;

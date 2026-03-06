@@ -4,6 +4,7 @@ export interface Vehicle {
   brand: string;
   price: number;
   status?: string;
+  fuelType?: 'PETROL' | 'ELECTRIC' | string;
   dealerId: number;
   imageUrl?: string; // backend returns full URL after mapping
 }

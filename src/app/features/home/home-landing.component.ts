@@ -1,6 +1,6 @@
 import { CommonModule } from '@angular/common';
 import { HttpErrorResponse } from '@angular/common/http';
-import { Component, ElementRef, ViewChild } from '@angular/core';
+import { Component } from '@angular/core';
 import { FormsModule } from '@angular/forms';
 import { Router, RouterLink } from '@angular/router';
 import { VehiclesApi } from '../../api/vehicles.service';
@@ -101,15 +101,12 @@ interface FaqItem {
             <button type="button" class="btn btn-ghost" (click)="loadVehicles()">Retry</button>
           </div>
 
-          <div class="carousel-frame" *ngIf="!errorMessage">
-            <button type="button" class="carousel-btn left" (click)="scrollCarousel(-1)" aria-label="Previous">
-              &#8249;
-            </button>
-            <div class="carousel-track" #carouselRef>
-              <ng-container *ngIf="loading; else featuredCards">
-                <app-skeleton-loader [grid]="true" variant="card" [count]="4"></app-skeleton-loader>
-              </ng-container>
-              <ng-template #featuredCards>
+          <div class="gallery-frame" *ngIf="!errorMessage">
+            <ng-container *ngIf="loading; else featuredCards">
+              <app-skeleton-loader [grid]="true" variant="card" [count]="4"></app-skeleton-loader>
+            </ng-container>
+            <ng-template #featuredCards>
+              <div class="gallery-track">
                 <app-vehicle-card
                   *ngFor="let vehicle of featuredVehicles"
                   [vehicle]="vehicle"
@@ -118,11 +115,8 @@ interface FaqItem {
                   (book)="goLogin()"
                   (favorite)="goLogin()"
                 ></app-vehicle-card>
-              </ng-template>
-            </div>
-            <button type="button" class="carousel-btn right" (click)="scrollCarousel(1)" aria-label="Next">
-              &#8250;
-            </button>
+              </div>
+            </ng-template>
           </div>
         </section>
 
@@ -178,8 +172,6 @@ interface FaqItem {
   styleUrl: './home-landing.component.css'
 })
 export class HomeLandingComponent {
-  @ViewChild('carouselRef') carouselRef?: ElementRef<HTMLElement>;
-
   vehicles: Vehicle[] = [];
   loading = false;
   errorMessage = '';
@@ -249,12 +241,6 @@ export class HomeLandingComponent {
   applyHeroSearch() {
     if (!this.heroSearch.trim()) return;
     this.activeTab = 'best';
-  }
-
-  scrollCarousel(direction: 1 | -1) {
-    const node = this.carouselRef?.nativeElement;
-    if (!node) return;
-    node.scrollBy({ left: direction * 360, behavior: 'smooth' });
   }
 
   goLogin() {

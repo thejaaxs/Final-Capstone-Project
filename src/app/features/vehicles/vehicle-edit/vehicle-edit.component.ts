@@ -85,7 +85,11 @@ export class VehicleEditComponent implements OnInit {
     this.loadDealers();
     this.id = Number(this.route.snapshot.paramMap.get('id'));
     this.api.getById(this.id).subscribe(v => {
-      this.model = { ...v, status: this.normalizeStatus(v.status) };
+      this.model = {
+        ...v,
+        status: this.normalizeStatus(v.status),
+        fuelType: this.normalizeFuelType(v.fuelType)
+      };
       this.loaded = true;
     });
   }
@@ -106,6 +110,7 @@ export class VehicleEditComponent implements OnInit {
 
   save() {
     this.model.status = this.normalizeStatus(this.model.status);
+    this.model.fuelType = this.normalizeFuelType(this.model.fuelType);
     this.saving = true;
     this.api.update(this.id, this.model).subscribe({
       next: () => {
@@ -130,7 +135,11 @@ export class VehicleEditComponent implements OnInit {
     if (!this.file) return;
     this.api.uploadImage(this.id, this.file).subscribe({
       next: (v) => {
-        this.model = { ...v, status: this.normalizeStatus(v.status) };
+        this.model = {
+          ...v,
+          status: this.normalizeStatus(v.status),
+          fuelType: this.normalizeFuelType(v.fuelType)
+        };
         this.toast.success('Image uploaded');
         this.file = undefined;
       },
@@ -144,7 +153,11 @@ export class VehicleEditComponent implements OnInit {
   deleteImage() {
     this.api.deleteImage(this.id).subscribe({
       next: (v) => {
-        this.model = { ...v, status: this.normalizeStatus(v.status) };
+        this.model = {
+          ...v,
+          status: this.normalizeStatus(v.status),
+          fuelType: this.normalizeFuelType(v.fuelType)
+        };
         this.toast.success('Image removed');
       },
       error: (err: HttpErrorResponse) => {
@@ -156,6 +169,10 @@ export class VehicleEditComponent implements OnInit {
 
   private normalizeStatus(status?: string): 'AVAILABLE' | 'OUT_OF_STOCK' {
     return (status || '').toUpperCase() === 'OUT_OF_STOCK' ? 'OUT_OF_STOCK' : 'AVAILABLE';
+  }
+
+  private normalizeFuelType(fuelType?: string): 'PETROL' | 'ELECTRIC' {
+    return (fuelType || '').toUpperCase() === 'ELECTRIC' ? 'ELECTRIC' : 'PETROL';
   }
 }
 

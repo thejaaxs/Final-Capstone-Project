@@ -185,7 +185,10 @@ export class FavoritesListComponent implements OnInit {
 
   delByProduct() {
     const p = this.bulkProduct.trim();
-    if (!p) return this.toast.error('Enter product name');
+    if (!p) {
+      this.toast.error('Enter product name');
+      return;
+    }
     if (!confirm(`Delete all favorites for product '${p}'?`)) return;
     this.api.deleteByProductName(p).subscribe(() => {
       this.toast.success('Deleted by product');

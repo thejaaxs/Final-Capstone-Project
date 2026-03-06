@@ -35,6 +35,11 @@ import { HttpErrorResponse } from '@angular/common/http';
             <option *ngFor="let status of availabilityOptions" [ngValue]="status">{{ status }}</option>
           </select>
 
+          <label>Fuel Type</label>
+          <select [(ngModel)]="model.fuelType" name="fuelType" required>
+            <option *ngFor="let fuel of fuelTypeOptions" [ngValue]="fuel">{{ fuel }}</option>
+          </select>
+
           <label>Dealer</label>
           <select [(ngModel)]="model.dealerId" name="dealerId" required>
             <option *ngFor="let d of dealers" [ngValue]="d.dealerId">
@@ -54,12 +59,13 @@ import { HttpErrorResponse } from '@angular/common/http';
   `
 })
 export class VehicleCreateComponent {
-  model: Vehicle = { name: '', brand: '', price: 1, status: 'AVAILABLE', dealerId: 1 };
+  model: Vehicle = { name: '', brand: '', price: 1, status: 'AVAILABLE', fuelType: 'PETROL', dealerId: 1 };
   dealers: Dealer[] = [];
   saving = false;
   selectedFile?: File;
   previewUrl = '';
   readonly availabilityOptions: Array<'AVAILABLE' | 'OUT_OF_STOCK'> = ['AVAILABLE', 'OUT_OF_STOCK'];
+  readonly fuelTypeOptions: Array<'PETROL' | 'ELECTRIC'> = ['PETROL', 'ELECTRIC'];
 
   constructor(
     private api: VehiclesApi,
@@ -86,6 +92,7 @@ export class VehicleCreateComponent {
 
   submit() {
     this.model.status = this.normalizeStatus(this.model.status);
+    this.model.fuelType = this.normalizeFuelType(this.model.fuelType);
     this.saving = true;
     this.api.add(this.model).subscribe({
       next: (created) => {
@@ -139,6 +146,10 @@ export class VehicleCreateComponent {
 
   private normalizeStatus(status?: string): 'AVAILABLE' | 'OUT_OF_STOCK' {
     return (status || '').toUpperCase() === 'OUT_OF_STOCK' ? 'OUT_OF_STOCK' : 'AVAILABLE';
+  }
+
+  private normalizeFuelType(fuelType?: string): 'PETROL' | 'ELECTRIC' {
+    return (fuelType || '').toUpperCase() === 'ELECTRIC' ? 'ELECTRIC' : 'PETROL';
   }
 }
 

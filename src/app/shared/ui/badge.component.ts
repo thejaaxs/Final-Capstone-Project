@@ -26,6 +26,18 @@ import { Component, Input } from '@angular/core';
       border-color: #f8e2ad;
     }
 
+    .mm-requested {
+      color: #865300;
+      background: #fff3d6;
+      border-color: #f8e2ad;
+    }
+
+    .mm-accepted {
+      color: #1d4ed8;
+      background: #e9f1ff;
+      border-color: #c8dbff;
+    }
+
     .mm-confirmed,
     .mm-paid,
     .mm-available,
@@ -33,6 +45,12 @@ import { Component, Input } from '@angular/core';
       color: #146438;
       background: #e5f7ee;
       border-color: #bde8d1;
+    }
+
+    .mm-rejected {
+      color: #9b1030;
+      background: #ffe9ef;
+      border-color: #ffc8d5;
     }
 
     .mm-cancelled,

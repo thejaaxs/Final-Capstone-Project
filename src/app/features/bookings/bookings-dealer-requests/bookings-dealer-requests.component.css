@@ -1,0 +1,4 @@
+.toolbar input[readonly] {
+  background: var(--mm-surface-soft);
+  color: var(--mm-text);
+}
