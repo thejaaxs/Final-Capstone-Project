@@ -35,6 +35,7 @@ export class ThemeService {
 
   private applyMode(mode: ThemeMode): void {
     const isDark = mode === 'dark';
+    document.documentElement.classList.toggle('dark', isDark);
     document.body.classList.toggle('dark', isDark);
     this.isDarkSubject.next(isDark);
   }

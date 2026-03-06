@@ -1,18 +1,27 @@
 import { CommonModule } from '@angular/common';
 import { Component, EventEmitter, Input, Output } from '@angular/core';
-import { RouterLink } from '@angular/router';
+import { Router } from '@angular/router';
+import { AuthService } from '../../core/services/auth.service';
+import { ToastService } from '../../core/services/toast.service';
 import { Vehicle } from '../models/vehicle.model';
 import { BadgeComponent } from './badge.component';
 
 @Component({
   standalone: true,
   selector: 'app-vehicle-card',
-  imports: [CommonModule, RouterLink, BadgeComponent],
+  imports: [CommonModule, BadgeComponent],
   template: `
-    <article class="mm-vehicle-card">
+    <article
+      class="mm-vehicle-card"
+      role="button"
+      tabindex="0"
+      aria-label="Open vehicle details"
+      (click)="openVehicle()"
+      (keydown)="handleCardKeydown($event)"
+    >
       <div class="image-wrap">
         <img [src]="vehicle.imageUrl || placeholderImage" [alt]="vehicle.name" class="vehicle-image" />
-        <button type="button" class="wish-btn" (click)="favorite.emit(vehicle)">&#9825;</button>
+        <button type="button" class="wish-btn" (click)="emitFavorite($event)">&#9825;</button>
       </div>
 
       <div class="content">
@@ -25,9 +34,9 @@ import { BadgeComponent } from './badge.component';
         </div>
 
         <div class="actions">
-          <a [routerLink]="['/customer/vehicles', vehicle.id]"><button class="btn btn-ghost" type="button">View Details</button></a>
-          <button class="btn" type="button" (click)="book.emit(vehicle)">Book Now</button>
-          <button class="btn btn-ghost" type="button" (click)="review.emit(vehicle)">Review</button>
+          <button class="btn btn-ghost" type="button" (click)="openVehicle($event)">View Details</button>
+          <button class="btn" type="button" (click)="emitBook($event)">Book Now</button>
+          <button class="btn btn-ghost" type="button" (click)="emitReview($event)">Review</button>
         </div>
       </div>
     </article>
@@ -43,6 +52,7 @@ import { BadgeComponent } from './badge.component';
       box-shadow: var(--mm-shadow-sm);
       transition: transform 0.18s ease, box-shadow 0.2s ease, border-color 0.2s ease;
       min-width: 0;
+      cursor: pointer;
     }
 
     .mm-vehicle-card:hover {
@@ -51,19 +61,23 @@ import { BadgeComponent } from './badge.component';
       box-shadow: var(--mm-shadow-md);
     }
 
-    .image-wrap {
-      position: relative;
-      border-radius: 12px;
-      overflow: hidden;
-      background: #edf3ff;
-    }
-
-    .vehicle-image {
-      width: 100%;
-      height: 170px;
-      object-fit: cover;
-      display: block;
-    }
+	    .image-wrap {
+	      position: relative;
+	      display: grid;
+	      place-items: center;
+	      border-radius: 12px;
+	      overflow: hidden;
+	      background: #edf3ff;
+	    }
+	
+	    .vehicle-image {
+	      width: 100%;
+	      height: 170px;
+	      object-fit: contain;
+	      object-position: center;
+	      padding: 0.65rem;
+	      display: block;
+	    }
 
     .wish-btn {
       position: absolute;
@@ -144,6 +158,12 @@ export class VehicleCardComponent {
   @Output() review = new EventEmitter<Vehicle>();
   placeholderImage = 'https://placehold.co/640x360/e5edf7/36597f?text=MotoMint';
 
+  constructor(
+    private router: Router,
+    private auth: AuthService,
+    private toast: ToastService
+  ) {}
+
   get metaLine(): string {
     const dealer = this.dealerName ? ` | ${this.dealerName}` : '';
     return `${this.vehicle.brand}${dealer}`;
@@ -151,5 +171,45 @@ export class VehicleCardComponent {
 
   get extraTag(): string {
     return (this.vehicle.fuelType || '').toUpperCase() === 'ELECTRIC' ? 'Electric' : 'Petrol';
+  }
+
+  handleCardKeydown(event: KeyboardEvent): void {
+    if (event.key !== 'Enter' && event.key !== ' ') return;
+    this.openVehicle(event);
+  }
+
+  openVehicle(event?: Event): void {
+    event?.preventDefault();
+    event?.stopPropagation();
+    if (!this.vehicle?.id) return;
+
+    const role = this.auth.getRole();
+    if (role === 'ROLE_CUSTOMER') {
+      this.router.navigate(['/customer/vehicles', this.vehicle.id]);
+      return;
+    }
+
+    if (!role) {
+      this.toast.info('Please login or sign up to view vehicle details.');
+      this.router.navigateByUrl('/login');
+      return;
+    }
+
+    this.toast.info('Vehicle details are available for customer accounts.');
+  }
+
+  emitFavorite(event: Event): void {
+    event.stopPropagation();
+    this.favorite.emit(this.vehicle);
+  }
+
+  emitBook(event: Event): void {
+    event.stopPropagation();
+    this.book.emit(this.vehicle);
+  }
+
+  emitReview(event: Event): void {
+    event.stopPropagation();
+    this.review.emit(this.vehicle);
   }
 }

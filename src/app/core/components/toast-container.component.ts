@@ -31,52 +31,52 @@ import { ToastService } from '../services/toast.service';
       width: min(420px, calc(100vw - 2rem));
     }
 
-    .toast {
-      display: flex;
-      align-items: start;
-      justify-content: space-between;
-      gap: 0.6rem;
-      padding: 0.76rem 0.86rem;
-      border-radius: 14px;
-      border: 1px solid var(--mm-border);
-      background: #f8fbff;
-      box-shadow: var(--mm-shadow-md);
-    }
-
-    .toast p {
-      margin: 0;
-      font-size: 0.88rem;
-      color: #203b5e;
-      line-height: 1.3;
-    }
-
-    .toast.success {
-      background: #edf9f2;
-      border-color: #b7e3c5;
-    }
-
-    .toast.error {
-      background: #fff3f4;
-      border-color: #f5c2c8;
-    }
-
-    .toast.info {
-      background: #f2f7ff;
-      border-color: #bfd5fb;
-    }
-
-    .close-btn {
-      min-width: 28px;
-      height: 28px;
-      border-radius: 8px;
-      border: 0;
-      padding: 0;
-      background: #dce8fb;
-      color: #23466f;
-      cursor: pointer;
-      font-weight: 700;
-      line-height: 1;
-    }
+	    .toast {
+	      display: flex;
+	      align-items: start;
+	      justify-content: space-between;
+	      gap: 0.6rem;
+	      padding: 0.76rem 0.86rem;
+	      border-radius: 14px;
+	      border: 1px solid var(--mm-border);
+	      background: color-mix(in srgb, var(--mm-surface) 92%, var(--mm-bg));
+	      box-shadow: var(--mm-shadow-md);
+	    }
+	
+	    .toast p {
+	      margin: 0;
+	      font-size: 0.88rem;
+	      color: var(--mm-text);
+	      line-height: 1.3;
+	    }
+	
+	    .toast.success {
+	      background: color-mix(in srgb, var(--mm-success) 14%, var(--mm-surface));
+	      border-color: color-mix(in srgb, var(--mm-success) 32%, var(--mm-border));
+	    }
+	
+	    .toast.error {
+	      background: color-mix(in srgb, var(--mm-danger) 14%, var(--mm-surface));
+	      border-color: color-mix(in srgb, var(--mm-danger) 32%, var(--mm-border));
+	    }
+	
+	    .toast.info {
+	      background: color-mix(in srgb, var(--mm-primary-600) 14%, var(--mm-surface));
+	      border-color: color-mix(in srgb, var(--mm-primary-600) 28%, var(--mm-border));
+	    }
+	
+	    .close-btn {
+	      min-width: 28px;
+	      height: 28px;
+	      border-radius: 8px;
+	      border: 0;
+	      padding: 0;
+	      background: var(--mm-ghost-bg);
+	      color: var(--mm-ghost-text);
+	      cursor: pointer;
+	      font-weight: 700;
+	      line-height: 1;
+	    }
   `]
 })
 export class ToastContainerComponent {

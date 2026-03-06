@@ -9,6 +9,7 @@ import { DealersApi } from '../../../api/dealers.service';
 import { VehiclesApi } from '../../../api/vehicles.service';
 import { AuthService } from '../../../core/services/auth.service';
 import { ToastService } from '../../../core/services/toast.service';
+import { LoanInfoComponent } from '../../../shared/components/loan-info/loan-info.component';
 import { Booking } from '../../../shared/models/booking.model';
 import { Vehicle } from '../../../shared/models/vehicle.model';
 import { EmiCalculatorComponent } from '../../../shared/components/emi-calculator/emi-calculator.component';
@@ -16,7 +17,7 @@ import { BadgeComponent } from '../../../shared/ui/badge.component';
 
 @Component({
   standalone: true,
-  imports: [CommonModule, RouterLink, BadgeComponent, EmiCalculatorComponent],
+  imports: [CommonModule, RouterLink, BadgeComponent, EmiCalculatorComponent, LoanInfoComponent],
   template: `
     <section class="page-card vehicle-details-page">
       <div class="state-card" *ngIf="loading">
@@ -29,49 +30,58 @@ import { BadgeComponent } from '../../../shared/ui/badge.component';
         <button type="button" (click)="load()">Retry</button>
       </div>
 
-      <article class="details-card" *ngIf="!loading && !errorMessage && vehicle">
-        <img [src]="vehicle.imageUrl || placeholderImage" [alt]="vehicle.name" class="vehicle-image" />
+      <div class="details-layout" *ngIf="!loading && !errorMessage && vehicle">
+        <article class="details-card">
+          <img [src]="vehicle.imageUrl || placeholderImage" [alt]="vehicle.name" class="vehicle-image" />
 
-        <div class="content">
-          <h2>{{ vehicle.name }}</h2>
-          <p class="muted">{{ vehicle.brand }}</p>
-          <div class="price-row">
-            <p class="price">INR {{ vehicle.price | number: '1.0-0' }}</p>
-            <button type="button" class="btn btn-ghost emi-trigger" (click)="openEmiCalculator()">
-              Calculate EMI
-            </button>
+          <div class="content">
+            <h2>{{ vehicle.name }}</h2>
+            <p class="muted">{{ vehicle.brand }}</p>
+            <div class="price-row">
+              <p class="price">INR {{ vehicle.price | number: '1.0-0' }}</p>
+              <button type="button" class="btn btn-ghost emi-trigger" (click)="openEmiCalculator()">
+                Calculate EMI
+              </button>
+            </div>
+            <app-badge [value]="formatVehicleStatus(vehicle.status)"></app-badge>
+            <p class="meta">Dealer: {{ dealerName || ('Dealer #' + vehicle.dealerId) }}</p>
+
+            <div class="actions">
+              <button type="button" class="btn" (click)="bookVehicle()">Book Now</button>
+              <button type="button" class="btn btn-ghost" (click)="addFavorite()">Add Favorite</button>
+              <button type="button" class="btn btn-ghost" (click)="addReview()">Write Review</button>
+              <a routerLink="/customer/vehicles"><button type="button" class="btn btn-ghost">Back</button></a>
+            </div>
+
+            <section class="payment-next-step" *ngIf="createdBooking as booking">
+              <h3>{{ isCreatedBookingAccepted() ? 'Booking approved. Complete payment to confirm.' : 'Booking request submitted.' }}</h3>
+              <p><span>Booking ID</span><b>#{{ booking.id || '-' }}</b></p>
+              <p><span>Amount</span><b>INR {{ (booking.amount ?? vehicle.price) | number: '1.0-0' }}</b></p>
+              <p><span>Booking Status</span><b>{{ normalizeBookingStatus(booking.bookingStatus) }}</b></p>
+              <p><span>Payment Status</span><b>{{ normalizePaymentStatus(booking.paymentStatus) }}</b></p>
+              <p class="approval-note" *ngIf="isCreatedBookingWaiting()">Waiting for dealer approval...</p>
+              <p class="approval-note approval-ok" *ngIf="isCreatedBookingAccepted()">Approved! You can pay now.</p>
+              <p class="approval-note approval-bad" *ngIf="isCreatedBookingRejected()">Dealer rejected booking.</p>
+              <button
+                type="button"
+                class="btn"
+                [disabled]="!booking.id || !canPayCreatedBooking()"
+                [title]="payButtonHint()"
+                (click)="goToPayment()"
+              >
+                Pay Now (Card)
+              </button>
+            </section>
           </div>
-          <app-badge [value]="formatVehicleStatus(vehicle.status)"></app-badge>
-          <p class="meta">Dealer: {{ dealerName || ('Dealer #' + vehicle.dealerId) }}</p>
+        </article>
 
-          <div class="actions">
-            <button type="button" class="btn" (click)="bookVehicle()">Book Now</button>
-            <button type="button" class="btn btn-ghost" (click)="addFavorite()">Add Favorite</button>
-            <button type="button" class="btn btn-ghost" (click)="addReview()">Write Review</button>
-            <a routerLink="/customer/vehicles"><button type="button" class="btn btn-ghost">Back</button></a>
+        <aside class="details-sidebar" id="affordability-sidebar" aria-label="EMI and loan information">
+          <div class="sidebar-stack">
+            <app-emi-calculator [price]="vehicle.price"></app-emi-calculator>
+            <app-loan-info></app-loan-info>
           </div>
-
-          <section class="payment-next-step" *ngIf="createdBooking as booking">
-            <h3>{{ isCreatedBookingAccepted() ? 'Booking approved. Complete payment to confirm.' : 'Booking request submitted.' }}</h3>
-            <p><span>Booking ID</span><b>#{{ booking.id || '-' }}</b></p>
-            <p><span>Amount</span><b>INR {{ (booking.amount ?? vehicle.price) | number: '1.0-0' }}</b></p>
-            <p><span>Booking Status</span><b>{{ normalizeBookingStatus(booking.bookingStatus) }}</b></p>
-            <p><span>Payment Status</span><b>{{ normalizePaymentStatus(booking.paymentStatus) }}</b></p>
-            <p class="approval-note" *ngIf="isCreatedBookingWaiting()">Waiting for dealer approval...</p>
-            <p class="approval-note approval-ok" *ngIf="isCreatedBookingAccepted()">Approved! You can pay now.</p>
-            <p class="approval-note approval-bad" *ngIf="isCreatedBookingRejected()">Dealer rejected booking.</p>
-            <button
-              type="button"
-              class="btn"
-              [disabled]="!booking.id || !canPayCreatedBooking()"
-              [title]="payButtonHint()"
-              (click)="goToPayment()"
-            >
-              Pay Now (Card)
-            </button>
-          </section>
-        </div>
-      </article>
+        </aside>
+      </div>
 
       <div class="confirm-overlay" *ngIf="confirmBookingOpen">
         <section class="confirm-modal" role="dialog" aria-modal="true" aria-label="Confirm booking">
@@ -91,11 +101,6 @@ import { BadgeComponent } from '../../../shared/ui/badge.component';
         </section>
       </div>
 
-      <app-emi-calculator
-        [open]="emiModalOpen"
-        [price]="vehicle?.price ?? null"
-        (close)="closeEmiCalculator()"
-      ></app-emi-calculator>
     </section>
   `,
   styles: [`
@@ -104,8 +109,15 @@ import { BadgeComponent } from '../../../shared/ui/badge.component';
       gap: 0.9rem;
     }
 
+    .details-layout {
+      display: grid;
+      grid-template-columns: minmax(0, 1.8fr) minmax(320px, 1fr);
+      align-items: start;
+      gap: 1rem;
+    }
+
     .details-card {
-      background: #fff;
+      background: var(--mm-surface);
       border: 1px solid var(--mm-border);
       border-radius: 16px;
       box-shadow: var(--mm-shadow-md);
@@ -114,29 +126,44 @@ import { BadgeComponent } from '../../../shared/ui/badge.component';
       grid-template-columns: minmax(260px, 460px) 1fr;
     }
 
-    .vehicle-image {
-      width: 100%;
-      height: 100%;
-      min-height: 280px;
-      object-fit: cover;
-      background: #edf3ff;
+    .details-sidebar {
+      position: sticky;
+      top: 5.2rem;
     }
+
+    .sidebar-stack {
+      display: grid;
+      gap: 0.95rem;
+    }
+
+		    .vehicle-image {
+		      width: 100%;
+		      height: 100%;
+		      min-height: 280px;
+		      max-height: 420px;
+		      object-fit: contain;
+		      object-position: center;
+		      padding: 1rem;
+		      background: color-mix(in srgb, var(--mm-primary-100) 50%, var(--mm-surface));
+		    }
 
     .content {
       padding: 1rem;
+      display: grid;
+      gap: 0.72rem;
     }
 
-    .muted {
-      margin: 0 0 0.55rem;
-      color: #5c7290;
-    }
+	    .muted {
+	      margin: 0;
+	      color: var(--mm-text-muted);
+	    }
 
-    .price {
-      margin: 0 0 0.35rem;
-      font-size: 1.4rem;
-      font-weight: 700;
-      color: #103050;
-    }
+	    .price {
+	      margin: 0;
+	      font-size: 1.4rem;
+	      font-weight: 700;
+	      color: var(--mm-text);
+	    }
 
     .price-row {
       display: flex;
@@ -150,10 +177,10 @@ import { BadgeComponent } from '../../../shared/ui/badge.component';
       padding: 0.4rem 0.68rem;
     }
 
-    .meta {
-      margin: 0 0 0.8rem;
-      color: #58718d;
-    }
+	    .meta {
+	      margin: 0 0 0.8rem;
+	      color: var(--mm-text-muted);
+	    }
 
     .actions {
       display: flex;
@@ -161,47 +188,51 @@ import { BadgeComponent } from '../../../shared/ui/badge.component';
       gap: 0.5rem;
     }
 
-    .payment-next-step {
-      margin-top: 1rem;
-      border: 1px solid #d6e3fb;
-      background: #f4f8ff;
-      border-radius: 12px;
-      padding: 0.8rem;
-      display: grid;
-      gap: 0.45rem;
+    .actions .btn,
+    .actions a {
+      width: fit-content;
     }
 
-    .payment-next-step h3 {
-      margin: 0;
-      font-size: 1.02rem;
-      color: #143d68;
-    }
+	    .payment-next-step {
+	      border: 1px solid color-mix(in srgb, var(--mm-primary-600) 24%, var(--mm-border));
+	      background: color-mix(in srgb, var(--mm-primary-600) 8%, var(--mm-surface));
+	      border-radius: 12px;
+	      padding: 0.8rem;
+	      display: grid;
+	      gap: 0.45rem;
+	    }
 
-    .payment-next-step p {
-      margin: 0;
-      display: flex;
-      justify-content: space-between;
-      gap: 0.6rem;
-      color: #284c77;
-    }
+	    .payment-next-step h3 {
+	      margin: 0;
+	      font-size: 1.02rem;
+	      color: var(--mm-text);
+	    }
 
-    .payment-next-step p span {
-      color: #577396;
-    }
+	    .payment-next-step p {
+	      margin: 0;
+	      display: flex;
+	      justify-content: space-between;
+	      gap: 0.6rem;
+	      color: var(--mm-text);
+	    }
+	
+	    .payment-next-step p span {
+	      color: var(--mm-text-muted);
+	    }
 
-    .approval-note {
-      margin: 0;
-      font-weight: 700;
-      color: #946200;
-    }
-
-    .approval-ok {
-      color: #1d4ed8;
-    }
-
-    .approval-bad {
-      color: #b91c1c;
-    }
+	    .approval-note {
+	      margin: 0;
+	      font-weight: 700;
+	      color: var(--mm-warning);
+	    }
+	
+	    .approval-ok {
+	      color: var(--mm-primary-600);
+	    }
+	
+	    .approval-bad {
+	      color: var(--mm-danger);
+	    }
 
     .confirm-overlay {
       position: fixed;
@@ -213,35 +244,35 @@ import { BadgeComponent } from '../../../shared/ui/badge.component';
       z-index: 5500;
     }
 
-    .confirm-modal {
-      width: min(100%, 520px);
-      background: #fff;
-      border-radius: 16px;
-      border: 1px solid #dbe3f3;
-      box-shadow: 0 18px 40px rgba(18, 42, 78, 0.3);
-      padding: 1rem;
-    }
+	    .confirm-modal {
+	      width: min(100%, 520px);
+	      background: var(--mm-surface);
+	      border-radius: 16px;
+	      border: 1px solid var(--mm-border);
+	      box-shadow: var(--mm-shadow-lg);
+	      padding: 1rem;
+	    }
 
     .confirm-modal h3 {
       margin: 0 0 0.65rem;
     }
 
-    .summary-line {
-      margin: 0.35rem 0;
-      display: flex;
-      justify-content: space-between;
-      gap: 0.55rem;
-      color: #24486f;
-    }
-
-    .summary-line span {
-      color: #597392;
-    }
-
-    .summary-text {
-      margin: 0.55rem 0 0;
-      color: #4c6789;
-    }
+	    .summary-line {
+	      margin: 0.35rem 0;
+	      display: flex;
+	      justify-content: space-between;
+	      gap: 0.55rem;
+	      color: var(--mm-text);
+	    }
+	
+	    .summary-line span {
+	      color: var(--mm-text-muted);
+	    }
+	
+	    .summary-text {
+	      margin: 0.55rem 0 0;
+	      color: var(--mm-text-muted);
+	    }
 
     .emi-link {
       margin-top: 0.55rem;
@@ -256,11 +287,11 @@ import { BadgeComponent } from '../../../shared/ui/badge.component';
       cursor: pointer;
     }
 
-    .error-text {
-      margin: 0.55rem 0 0;
-      color: #b91c1c;
-      font-weight: 600;
-    }
+	    .error-text {
+	      margin: 0.55rem 0 0;
+	      color: var(--mm-danger);
+	      font-weight: 600;
+	    }
 
     .confirm-actions {
       margin-top: 0.95rem;
@@ -269,9 +300,94 @@ import { BadgeComponent } from '../../../shared/ui/badge.component';
       gap: 0.5rem;
     }
 
+    @media (max-width: 1080px) {
+      .details-layout {
+        grid-template-columns: 1fr;
+      }
+
+      .details-sidebar {
+        position: static;
+        top: auto;
+      }
+    }
+
     @media (max-width: 840px) {
       .details-card {
         grid-template-columns: 1fr;
+      }
+
+      .vehicle-image {
+        min-height: 240px;
+      }
+    }
+
+    @media (max-width: 640px) {
+      .vehicle-details-page {
+        gap: 0.75rem;
+      }
+
+      .content {
+        padding: 0.88rem;
+      }
+
+      .price-row {
+        align-items: flex-start;
+      }
+
+      .emi-trigger {
+        width: 100%;
+        justify-content: center;
+      }
+
+      .actions {
+        flex-direction: column;
+      }
+
+      .actions > * {
+        width: 100%;
+      }
+
+      .actions .btn,
+      .actions a .btn {
+        width: 100%;
+      }
+
+      .payment-next-step p,
+      .summary-line {
+        flex-direction: column;
+        align-items: flex-start;
+      }
+
+      .confirm-modal {
+        width: min(100%, 100%);
+        padding: 0.9rem;
+      }
+
+      .confirm-actions {
+        flex-direction: column-reverse;
+      }
+
+      .confirm-actions .btn {
+        width: 100%;
+      }
+    }
+
+    @media (max-width: 420px) {
+      .vehicle-image {
+        min-height: 210px;
+      }
+
+      .content {
+        padding: 0.8rem;
+      }
+
+      .price {
+        font-size: 1.22rem;
+      }
+
+      .payment-next-step,
+      .confirm-modal {
+        padding: 0.8rem;
       }
     }
   `]
@@ -287,7 +403,6 @@ export class VehicleDetailsComponent implements OnInit, OnDestroy {
   bookingConfirmError = '';
   createdBooking?: Booking;
   resolvingCustomer = false;
-  emiModalOpen = false;
   private bookingStatusPollSub?: Subscription;
   private approvalToastShown = false;
   private rejectionToastShown = false;
@@ -419,11 +534,15 @@ export class VehicleDetailsComponent implements OnInit, OnDestroy {
   }
 
   openEmiCalculator() {
-    this.emiModalOpen = true;
-  }
-
-  closeEmiCalculator() {
-    this.emiModalOpen = false;
+    if (this.confirmBookingOpen) {
+      this.confirmBookingOpen = false;
+    }
+    window.setTimeout(() => {
+      document.getElementById('affordability-sidebar')?.scrollIntoView({
+        behavior: 'smooth',
+        block: 'start'
+      });
+    }, 0);
   }
 
   canPayCreatedBooking(): boolean {

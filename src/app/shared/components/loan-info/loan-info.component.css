@@ -1,0 +1,134 @@
+.loan-card {
+  display: grid;
+  gap: 0.9rem;
+  background: var(--surface, var(--mm-surface));
+  border: 1px solid var(--border, var(--mm-border));
+  border-radius: 18px;
+  box-shadow: var(--mm-shadow-md);
+  padding: 1rem;
+}
+
+.loan-head {
+  display: flex;
+  align-items: flex-start;
+  justify-content: space-between;
+  gap: 0.75rem;
+}
+
+.eyebrow {
+  margin: 0 0 0.18rem;
+  color: var(--primary, var(--mm-primary-600));
+  font-size: 0.74rem;
+  font-weight: 800;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+}
+
+.loan-head h3 {
+  margin: 0;
+  color: var(--text, var(--mm-text));
+  font-size: 1.08rem;
+}
+
+.intro,
+.disclaimer {
+  margin: 0;
+  color: var(--muted, var(--mm-text-muted));
+  font-size: 0.88rem;
+  line-height: 1.5;
+}
+
+.offer-list {
+  display: grid;
+  gap: 0.72rem;
+}
+
+.offer-item {
+  display: grid;
+  gap: 0.75rem;
+  border: 1px solid var(--border, var(--mm-border));
+  border-radius: 16px;
+  background: color-mix(in srgb, var(--surface, var(--mm-surface)) 94%, var(--primary, var(--mm-primary-600)) 6%);
+  padding: 0.85rem;
+}
+
+.offer-meta {
+  display: flex;
+  align-items: flex-start;
+  justify-content: space-between;
+  gap: 0.75rem;
+}
+
+.offer-meta h4 {
+  margin: 0 0 0.24rem;
+  color: var(--text, var(--mm-text));
+  font-size: 0.95rem;
+}
+
+.offer-meta p {
+  margin: 0;
+  color: var(--muted, var(--mm-text-muted));
+  font-size: 0.8rem;
+}
+
+.offer-stats {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 0.6rem;
+}
+
+.stat {
+  border: 1px solid color-mix(in srgb, var(--primary, var(--mm-primary-600)) 12%, var(--border, var(--mm-border)));
+  border-radius: 14px;
+  background: var(--surface, var(--mm-surface));
+  padding: 0.68rem 0.75rem;
+  display: grid;
+  gap: 0.18rem;
+}
+
+.stat span {
+  color: var(--muted, var(--mm-text-muted));
+  font-size: 0.75rem;
+  font-weight: 700;
+}
+
+.stat strong {
+  color: var(--text, var(--mm-text));
+  font-size: 0.9rem;
+}
+
+@media (max-width: 1280px) {
+  .offer-meta {
+    display: grid;
+  }
+
+  .offer-stats {
+    grid-template-columns: 1fr;
+  }
+}
+
+@media (max-width: 640px) {
+  .loan-card {
+    padding: 0.88rem;
+  }
+
+  .offer-meta,
+  .offer-stats {
+    grid-template-columns: 1fr;
+  }
+
+  .offer-meta {
+    display: grid;
+  }
+}
+
+@media (max-width: 420px) {
+  .offer-item,
+  .stat {
+    padding: 0.75rem;
+  }
+
+  .offer-meta .btn {
+    width: 100%;
+  }
+}

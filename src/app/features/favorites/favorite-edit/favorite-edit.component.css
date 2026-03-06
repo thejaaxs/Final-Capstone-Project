@@ -1,5 +1,10 @@
+.page-shell {
+  justify-items: center;
+}
+
 .card {
-  max-width: 760px;
+  width: min(100%, 760px);
+  margin-inline: auto;
 }
 
 form {

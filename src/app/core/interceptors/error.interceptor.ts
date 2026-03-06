@@ -1,8 +1,10 @@
-import { HttpErrorResponse, HttpInterceptorFn } from '@angular/common/http';
+import { HttpContextToken, HttpErrorResponse, HttpInterceptorFn } from '@angular/common/http';
 import { catchError, throwError } from 'rxjs';
 import { inject } from '@angular/core';
 import { ToastService } from '../services/toast.service';
 import { Router } from '@angular/router';
+
+export const SKIP_GLOBAL_ERROR_HANDLING = new HttpContextToken<boolean>(() => false);
 
 export const errorInterceptor: HttpInterceptorFn = (req, next) => {
   const toast = inject(ToastService);
@@ -10,6 +12,10 @@ export const errorInterceptor: HttpInterceptorFn = (req, next) => {
 
   return next(req).pipe(
     catchError((err: HttpErrorResponse) => {
+      if (req.context.get(SKIP_GLOBAL_ERROR_HANDLING)) {
+        return throwError(() => err);
+      }
+
       const url = req.url.toLowerCase();
       const isAuthRequest = url.includes('/auth/login') || url.includes('/auth/register');
       const rawMessage = extractBackendMessage(err);

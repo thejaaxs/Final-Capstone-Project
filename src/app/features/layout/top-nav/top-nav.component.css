@@ -19,7 +19,7 @@
 }
 
 .mm-topnav-inner.guest-mode {
-  grid-template-columns: auto auto 1fr;
+  grid-template-columns: auto 1fr auto;
 }
 
 .menu-toggle {
@@ -119,7 +119,16 @@
   gap: 0.45rem;
 }
 
+.mm-topnav-inner.guest-mode .brand {
+  justify-self: start;
+}
+
+.mm-topnav-inner.guest-mode .quick-actions {
+  display: none;
+}
+
 .quick-links {
+  margin-left: auto;
   justify-content: flex-end;
 }
 
@@ -128,6 +137,18 @@
   align-items: center;
   gap: 0.35rem;
   padding-inline: 0.7rem;
+}
+
+.guest-theme-toggle {
+  justify-self: end;
+}
+
+.guest-login-link {
+  justify-self: end;
+}
+
+.guest-login-link:hover {
+  text-decoration: none;
 }
 
 .theme-icon {
@@ -296,12 +317,6 @@
   padding: 0.55rem;
 }
 
-.guest-actions {
-  display: inline-flex;
-  align-items: center;
-  gap: 0.42rem;
-}
-
 .mobile-drawer {
   display: none;
 }
@@ -316,7 +331,7 @@
   }
 
   .mm-topnav-inner.guest-mode {
-    grid-template-columns: auto auto 1fr;
+    grid-template-columns: auto 1fr auto;
   }
 
   .desktop-nav {
@@ -331,7 +346,7 @@
   }
 
   .mm-topnav-inner.guest-mode {
-    grid-template-columns: auto auto 1fr;
+    grid-template-columns: 1fr auto auto;
   }
 
   .menu-toggle {
@@ -339,7 +354,6 @@
   }
 
   .quick-links,
-  .quick-actions .guest-actions,
   .quick-actions .notification-wrap,
   .quick-actions .theme-toggle {
     display: none;
@@ -373,9 +387,4 @@
     flex-wrap: wrap;
   }
 
-  .mobile-actions {
-    display: flex;
-    gap: 0.5rem;
-    flex-wrap: wrap;
-  }
 }

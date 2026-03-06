@@ -31,9 +31,9 @@ import { TopNavComponent } from '../layout/top-nav/top-nav.component';
           </button>
         </div>
 
-        <form (ngSubmit)="doLogin()" #f="ngForm">
-          <label>Email</label>
-          <input [(ngModel)]="emailId" name="emailId" #emailCtrl="ngModel" type="email" required />
+	        <form (ngSubmit)="doLogin()" #f="ngForm">
+	          <label>Email</label>
+	          <input [(ngModel)]="emailId" name="emailId" #emailCtrl="ngModel" type="email" required />
           <small class="field-error" *ngIf="emailCtrl.invalid && (emailCtrl.touched || f.submitted)">
             Enter a valid email address.
           </small>
@@ -44,16 +44,20 @@ import { TopNavComponent } from '../layout/top-nav/top-nav.component';
             Password must be at least 6 characters.
           </small>
 
-          <div class="auth-actions">
-            <button type="submit" [disabled]="f.invalid || loading || !selectedRole">
-              {{ loading ? 'Signing In...' : 'Login' }}
-            </button>
-            <button type="button" class="ghost-btn btn-ghost" (click)="goRegister()">Sign Up</button>
-          </div>
-        </form>
-      </div>
-    </section>
-  `,
+	          <div class="auth-actions">
+	            <button type="submit" [disabled]="f.invalid || loading || !selectedRole">
+	              {{ loading ? 'Signing In...' : 'Login' }}
+	            </button>
+	          </div>
+
+	          <p class="auth-switch">
+	            New to MotoMint?
+	            <button type="button" class="inline-link" (click)="goRegister()">Create an account</button>
+	          </p>
+	        </form>
+	      </div>
+	    </section>
+	  `,
   styles: [`
     .auth-page {
       min-height: calc(100vh - 70px);
@@ -129,15 +133,38 @@ import { TopNavComponent } from '../layout/top-nav/top-nav.component';
       gap: 0.52rem;
     }
 
-    .auth-actions {
-      display: flex;
-      gap: 0.5rem;
-      margin-top: 0.45rem;
-    }
+	    .auth-actions {
+	      display: flex;
+	      margin-top: 0.45rem;
+	    }
 
-    .field-error {
-      color: var(--mm-danger);
-      font-size: 0.8rem;
+	    .auth-switch {
+	      margin: 0.25rem 0 0;
+	      color: var(--mm-text-muted);
+	      font-size: 0.88rem;
+	      text-align: center;
+	    }
+
+	    .inline-link {
+	      border: 0;
+	      padding: 0;
+	      margin: 0;
+	      background: transparent;
+	      color: var(--mm-primary-600);
+	      font: inherit;
+	      font-weight: 700;
+	      text-decoration: underline;
+	      cursor: pointer;
+	    }
+
+	    .inline-link:hover {
+	      background: transparent;
+	      color: var(--mm-primary-700);
+	    }
+
+	    .field-error {
+	      color: var(--mm-danger);
+	      font-size: 0.8rem;
       margin-top: -0.25rem;
     }
 

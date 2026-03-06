@@ -16,44 +16,57 @@ interface NavItem {
   standalone: true,
   selector: 'app-top-nav',
   imports: [CommonModule, RouterLink, RouterLinkActive],
-  template: `
-    <header class="mm-topnav">
-      <div class="mm-topnav-inner" [class.guest-mode]="!isAuthenticated">
-        <button type="button" class="menu-toggle" (click)="toggleMobileNav($event)" aria-label="Toggle navigation">
-          <span></span>
-          <span></span>
-          <span></span>
-        </button>
+	  template: `
+	    <header class="mm-topnav">
+	      <div class="mm-topnav-inner" [class.guest-mode]="!isAuthenticated">
+	        <button *ngIf="isAuthenticated" type="button" class="menu-toggle" (click)="toggleMobileNav($event)" aria-label="Toggle navigation">
+	          <span></span>
+	          <span></span>
+	          <span></span>
+	        </button>
 
-        <a class="brand" routerLink="/home" (click)="closeAllMenus()">
-          <span class="brand-mark">MM</span>
-          <span class="brand-text">
-            <strong>MotoMint</strong>
-            <small>Two-wheeler marketplace</small>
-          </span>
-        </a>
+		        <a class="brand" routerLink="/home" (click)="closeAllMenus()">
+		          <span class="brand-mark">MM</span>
+		          <span class="brand-text">
+		            <strong>MotoMint</strong>
+		            <small>Two-wheeler marketplace</small>
+		          </span>
+		        </a>
+
+	        <a *ngIf="!isAuthenticated" routerLink="/login" class="guest-login-link btn btn-ghost" (click)="closeAllMenus()">
+	          Login
+	        </a>
+
+	        <button
+	          *ngIf="!isAuthenticated"
+	          type="button"
+	          class="theme-toggle guest-theme-toggle btn btn-ghost"
+	          aria-label="Toggle dark mode"
+	          title="Toggle dark mode"
+	          [attr.aria-pressed]="isDarkMode"
+	          (click)="toggleTheme($event)"
+	        >
+	          <span class="theme-icon">{{ isDarkMode ? '\u2600' : '\u263E' }}</span>
+	        </button>
 
         <nav class="nav-links desktop-nav" *ngIf="navLinks.length && isAuthenticated">
           <a *ngFor="let link of navLinks" [routerLink]="link.path" routerLinkActive="active">{{ link.label }}</a>
         </nav>
 
-        <div class="quick-actions">
-          <nav class="nav-links quick-links" *ngIf="navLinks.length && !isAuthenticated">
-            <a *ngFor="let link of navLinks" [routerLink]="link.path" routerLinkActive="active">{{ link.label }}</a>
-          </nav>
+	        <div class="quick-actions">
+	          <button
+	            type="button"
+	            class="theme-toggle btn btn-ghost"
+	            aria-label="Toggle dark mode"
+	            title="Toggle dark mode"
+	            [attr.aria-pressed]="isDarkMode"
+	            (click)="toggleTheme($event)"
+	            *ngIf="isAuthenticated"
+	          >
+	            <span class="theme-icon">{{ isDarkMode ? '\u2600' : '\u263E' }}</span>
+	          </button>
 
-          <button
-            type="button"
-            class="theme-toggle btn btn-ghost"
-            aria-label="Toggle dark mode"
-            title="Toggle dark mode"
-            [attr.aria-pressed]="isDarkMode"
-            (click)="toggleTheme($event)"
-          >
-            <span class="theme-icon">{{ isDarkMode ? '\u2600' : '\u263E' }}</span>
-          </button>
-
-          <div class="notification-wrap" *ngIf="showDealerNotifications">
+	          <div class="notification-wrap" *ngIf="showDealerNotifications">
             <button
               type="button"
               class="bell-btn"
@@ -80,17 +93,12 @@ interface NavItem {
                 <small *ngIf="item.createdAt">{{ item.createdAt | date: 'medium' }}</small>
               </article>
 
-              <button type="button" class="btn btn-ghost note-footer-btn" (click)="openDealerBookings()">
-                Open Bookings
-              </button>
-            </div>
-          </div>
-
-          <div class="guest-actions" *ngIf="!isAuthenticated">
-            <a routerLink="/login"><button type="button" class="btn btn-ghost">Login</button></a>
-            <a routerLink="/register"><button type="button" class="btn btn-accent">Register</button></a>
-          </div>
-        </div>
+	              <button type="button" class="btn btn-ghost note-footer-btn" (click)="openDealerBookings()">
+	                Open Bookings
+	              </button>
+	            </div>
+	          </div>
+	        </div>
 
         <div class="account-wrap" *ngIf="isAuthenticated">
           <button type="button" class="profile-btn" (click)="toggleProfile($event)">
@@ -114,18 +122,14 @@ interface NavItem {
             {{ link.label }}
           </a>
         </nav>
-        <div class="mobile-theme">
-          <button type="button" class="btn btn-ghost" aria-label="Toggle dark mode" title="Toggle dark mode" (click)="toggleTheme()">
-            <span class="theme-icon">{{ isDarkMode ? '\u2600' : '\u263E' }}</span>
-          </button>
-        </div>
-        <div class="mobile-actions" *ngIf="!isAuthenticated">
-          <a routerLink="/login"><button type="button" class="btn btn-ghost" (click)="closeAllMenus()">Login</button></a>
-          <a routerLink="/register"><button type="button" class="btn btn-accent" (click)="closeAllMenus()">Register</button></a>
-        </div>
-      </div>
-    </header>
-  `,
+	        <div class="mobile-theme">
+	          <button type="button" class="btn btn-ghost" aria-label="Toggle dark mode" title="Toggle dark mode" (click)="toggleTheme()">
+	            <span class="theme-icon">{{ isDarkMode ? '\u2600' : '\u263E' }}</span>
+	          </button>
+	        </div>
+	      </div>
+	    </header>
+	  `,
   styleUrl: './top-nav.component.css'
 })
 export class TopNavComponent implements OnInit, OnDestroy {
@@ -270,18 +274,15 @@ export class TopNavComponent implements OnInit, OnDestroy {
       ];
     }
 
-    if (role === 'ROLE_ADMIN') {
-      return [
-        { label: 'Dealers', path: '/admin/dealers' },
-        { label: 'Customers', path: '/admin/customers' },
-      ];
-    }
-
-    return [
-      { label: 'Home', path: '/home' },
-      { label: 'Browse', path: '/login' },
-    ];
-  }
+	        if (role === 'ROLE_ADMIN') {
+	      return [
+	        { label: 'Dealers', path: '/admin/dealers' },
+	        { label: 'Customers', path: '/admin/customers' },
+	      ];
+	    }
+	
+	    return [];
+	  }
 
   private startDealerNotifications(): void {
     this.notificationsStarted = true;

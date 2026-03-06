@@ -60,11 +60,20 @@ export class VehiclesApi {
 
   private normalizeVehicle(v: Vehicle): Vehicle {
     const fuelType = (v?.fuelType || '').toUpperCase() === 'ELECTRIC' ? 'ELECTRIC' : 'PETROL';
-    if (!v?.imageUrl) return { ...v, fuelType };
+    const rideType = !v?.rideType ? v?.rideType : (v.rideType || '').toUpperCase() === 'HIGHWAY' ? 'HIGHWAY' : 'CITY';
+    const mileage = this.normalizePositiveNumber(v?.mileage);
+    const suitableDailyKm = this.normalizePositiveNumber(v?.suitableDailyKm);
+    const normalized = { ...v, fuelType, rideType, mileage, suitableDailyKm };
+    if (!v?.imageUrl) return normalized;
     if (v.imageUrl.startsWith('http://') || v.imageUrl.startsWith('https://') || v.imageUrl.startsWith('/api')) {
-      return { ...v, fuelType };
+      return normalized;
     }
     const prefix = v.imageUrl.startsWith('/') ? '' : '/';
-    return { ...v, fuelType, imageUrl: `${environment.apiBaseUrl}${prefix}${v.imageUrl}` };
+    return { ...normalized, imageUrl: `${environment.apiBaseUrl}${prefix}${v.imageUrl}` };
+  }
+
+  private normalizePositiveNumber(value?: number | null): number | undefined {
+    const normalized = Number(value);
+    return Number.isFinite(normalized) && normalized > 0 ? normalized : undefined;
   }
 }

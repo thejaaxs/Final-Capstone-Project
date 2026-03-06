@@ -8,10 +8,76 @@
 
 form {
   display: grid;
-  gap: 0.55rem;
+  gap: 1rem;
 }
 
 .upload-actions {
   display: grid;
-  gap: 0.45rem;
+  gap: 0.75rem;
+}
+
+.form-grid {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 0.95rem 1rem;
+}
+
+.field {
+  display: grid;
+  gap: 0.4rem;
+}
+
+.field-full {
+  grid-column: 1 / -1;
+}
+
+.form-section {
+  display: grid;
+  gap: 0.9rem;
+  padding: 1rem;
+  border: 1px solid var(--mm-border);
+  border-radius: var(--mm-radius-md);
+  background: var(--mm-surface-soft);
+}
+
+.section-heading {
+  display: grid;
+  gap: 0.2rem;
+}
+
+.section-heading p {
+  margin: 0;
+  color: var(--mm-text-muted);
+}
+
+.field-error {
+  color: var(--mm-danger);
+  font-size: 0.78rem;
+}
+
+.file-preview {
+  max-width: 100%;
+  border-radius: var(--mm-radius-sm);
+  border: 1px solid var(--mm-border);
+}
+
+.form-actions {
+  display: flex;
+  justify-content: flex-end;
+}
+
+@media (max-width: 720px) {
+  .form-grid {
+    grid-template-columns: 1fr;
+  }
+
+  .table-actions,
+  .form-actions {
+    flex-direction: column;
+  }
+
+  .form-actions .btn,
+  .table-actions .btn {
+    width: 100%;
+  }
 }

@@ -1,5 +1,10 @@
+.page-shell {
+  justify-items: center;
+}
+
 .card {
-  max-width: 620px;
+  width: min(100%, 620px);
+  margin-inline: auto;
 }
 
 .subtitle {
@@ -11,7 +16,7 @@
   border: 1px solid var(--mm-border);
   border-radius: 12px;
   padding: 0.8rem;
-  background: #fbfdff;
+  background: color-mix(in srgb, var(--mm-surface) 92%, var(--mm-bg));
   margin-bottom: 0.8rem;
 }
 
@@ -27,10 +32,10 @@
 }
 
 .hint-box {
-  border: 1px dashed #c5d7f7;
+  border: 1px dashed var(--mm-border-strong);
   border-radius: 12px;
   padding: 0.8rem;
-  background: #f5f9ff;
+  background: color-mix(in srgb, var(--mm-primary-600) 8%, var(--mm-surface));
 }
 
 .hint-box h4 {
@@ -66,21 +71,21 @@
 
 .error {
   margin-top: 0.7rem;
-  color: #b91c1c;
+  color: var(--mm-danger);
   font-weight: 600;
 }
 
 .success {
   margin-top: 0.7rem;
-  color: #166534;
+  color: var(--mm-success);
   font-weight: 700;
 }
 
 .verify-card {
   margin-top: 0.9rem;
-  border: 1px solid #b9e4c8;
+  border: 1px solid color-mix(in srgb, var(--mm-success) 30%, var(--mm-border));
   border-radius: 12px;
-  background: #edf9f2;
+  background: color-mix(in srgb, var(--mm-success) 12%, var(--mm-surface));
   padding: 0.8rem;
   display: grid;
   gap: 0.35rem;
@@ -98,11 +103,11 @@
 }
 
 .verify-card p span {
-  color: #4a6f56;
+  color: var(--mm-text-muted);
 }
 
 .verify-card small {
-  color: #345243;
+  color: var(--mm-text-muted);
 }
 
 @keyframes spin {

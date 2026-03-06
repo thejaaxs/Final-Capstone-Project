@@ -48,8 +48,18 @@
   --mm-radius-sm: 10px;
   --mm-radius-md: 14px;
   --mm-radius-lg: 16px;
+
+  --bg: var(--mm-bg);
+  --surface: var(--mm-surface);
+  --surface-soft: var(--mm-surface-soft);
+  --border: var(--mm-border);
+  --border-strong: var(--mm-border-strong);
+  --text: var(--mm-text);
+  --muted: var(--mm-text-muted);
+  --primary: var(--mm-primary-600);
 }
 
+html.dark,
 body.dark {
   color-scheme: dark;
 
@@ -86,6 +96,14 @@ body.dark {
 *::before,
 *::after {
   box-sizing: border-box;
+}
+
+html {
+  min-height: 100%;
+  background:
+    radial-gradient(90rem 40rem at -5% -5%, var(--mm-bg-radial-a) 0%, transparent 52%),
+    radial-gradient(85rem 44rem at 110% 105%, var(--mm-bg-radial-b) 0%, transparent 40%),
+    var(--mm-bg);
 }
 
 html,
