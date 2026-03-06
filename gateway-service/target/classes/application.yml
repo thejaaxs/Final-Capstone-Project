@@ -1,0 +1,92 @@
+spring:
+  application:
+    name: GATEWAY-SERVICE
+
+  cloud:
+    gateway:
+      globalcors:
+        add-to-simple-url-handler-mapping: true
+        corsConfigurations:
+          '[/**]':
+            allowedOrigins:
+              - "http://localhost:4200"
+            allowedMethods:
+              - GET
+              - POST
+              - PUT
+              - DELETE
+              - OPTIONS
+            allowedHeaders:
+              - "*"
+            allowCredentials: true
+
+      routes:
+        - id: dealer-service
+          uri: lb://DEALER-SERVICE
+          predicates:
+            - Path=/dealers/**
+
+        - id: favourites-service
+          uri: lb://FAVOURITES
+          predicates:
+            - Path=/favorites/**
+
+        - id: reviews-service
+          uri: lb://REVIEWS-SERVICE
+          predicates:
+            - Path=/reviews/**
+
+        - id: customer-service
+          uri: lb://CUSTOMER-SERVICE
+          predicates:
+            - Path=/customers/**
+
+        - id: vehicle-service
+          uri: lb://VEHICLE-SERVICE
+          predicates:
+            - Path=/vehicles/**
+
+        - id: booking-service
+          uri: lb://BOOKING
+          predicates:
+            - Path=/bookings/**
+
+        - id: payment-service
+          uri: lb://PAYMENT
+          predicates:
+            - Path=/payments/**
+
+        - id: login-service
+          uri: lb://LOGIN-SERVICE
+          predicates:
+            - Path=/auth/**
+
+        - id: recommendation-service
+          uri: lb://RECOMMENDATION-SERVICE
+          predicates:
+            - Path=/recommend/**
+
+        - id: dealer-chat-service
+          uri: lb://RECOMMENDATION-SERVICE
+          predicates:
+            - Path=/dealer-chat/**
+
+server:
+  port: 8080
+
+eureka:
+  client:
+    service-url:
+      defaultZone: http://localhost:8761/eureka
+    register-with-eureka: true
+    fetch-registry: true
+  instance:
+    hostname: localhost
+    ip-address: 127.0.0.1
+    prefer-ip-address: false
+
+management:
+  endpoints:
+    web:
+      exposure:
+        include: "*"
